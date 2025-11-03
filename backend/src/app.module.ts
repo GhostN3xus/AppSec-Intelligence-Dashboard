@@ -20,6 +20,8 @@ import { ImportsModule } from './modules/imports/imports.module';
 import { DependencyFindingsModule } from './modules/dependency-findings/dependency-findings.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { RolesGuard } from './common/guards/roles.guard';
+import { HealthModule } from './modules/health/health.module';
+
 
 @Module({
   imports: [
@@ -46,6 +48,14 @@ import { RolesGuard } from './common/guards/roles.guard';
     AiModule,
     DomainsModule,
     InventoryModule,
+    HealthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    RolesGuard,
   ],
   providers: [
     {

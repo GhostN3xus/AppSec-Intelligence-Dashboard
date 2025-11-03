@@ -24,7 +24,12 @@
     "tailwindcss-animate": "1.0.7",
     "chart.js": "4.4.1",
     "react-chartjs-2": "5.2.0",
-    "xlsx": "0.18.5"
+    "xlsx": "0.18.5",
+    "i18next": "23.11.5",
+    "next-i18next": "14.0.2",
+    "react-i18next": "13.5.0",
+    "i18next-browser-languagedetector": "8.0.0",
+    "react-markdown": "9.0.1"
   },
   "devDependencies": {
     "@types/node": "20.10.5",
@@ -35,6 +40,7 @@
     "tailwindcss": "3.3.5",
     "eslint": "8.56.0",
     "eslint-config-next": "14.1.0",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "@tailwindcss/typography": "0.5.10"
   }
 }

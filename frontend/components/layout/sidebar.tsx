@@ -22,6 +22,15 @@ import {
   Cog6ToothIcon,
   BeakerIcon,
   LinkIcon,
+  HomeIcon,
+  DocumentMagnifyingGlassIcon,
+} from '@heroicons/react/24/outline';
+import { useAuthStore } from '../../store/auth-store';
+import { useTranslation } from 'react-i18next';
+
+type NavigationItem = {
+  labelKey: string;
+  fallback: string;
 } from '@heroicons/react/24/outline';
 import { useAuthStore } from '../../store/auth-store';
 
@@ -33,6 +42,26 @@ type NavigationItem = {
 };
 
 const navigation: NavigationItem[] = [
+  { labelKey: 'navigation.home', fallback: 'Home', href: '/home', icon: HomeIcon },
+  { labelKey: 'navigation.dashboard', fallback: 'Dashboard', href: '/dashboard', icon: ChartBarIcon },
+  { labelKey: 'navigation.inventory', fallback: 'Inventário', href: '/inventory', icon: ClipboardDocumentCheckIcon },
+  { labelKey: 'navigation.applications', fallback: 'Aplicações', href: '/applications', icon: CpuChipIcon },
+  { labelKey: 'navigation.responsibles', fallback: 'Responsáveis', href: '/responsaveis', icon: UserGroupIcon },
+  { labelKey: 'navigation.domains', fallback: 'Domínios', href: '/domains', icon: GlobeAltIcon },
+  { labelKey: 'navigation.adminUsers', fallback: 'Admin Usuários', href: '/admin/users', icon: AdjustmentsHorizontalIcon, roles: ['admin'] },
+  { labelKey: 'navigation.sast', fallback: 'SAST', href: '/sast', icon: ShieldCheckIcon },
+  { labelKey: 'navigation.sca', fallback: 'SCA', href: '/sast/sca', icon: BeakerIcon },
+  { labelKey: 'navigation.dast', fallback: 'DAST', href: '/dast', icon: BoltIcon },
+  { labelKey: 'navigation.sla', fallback: 'SLA', href: '/sla', icon: ClockIcon },
+  { labelKey: 'navigation.reports', fallback: 'Relatórios', href: '/templates', icon: DocumentDuplicateIcon },
+  { labelKey: 'navigation.wordEditor', fallback: 'Editor Word', href: '/editor', icon: DocumentTextIcon },
+  { labelKey: 'navigation.excelEditor', fallback: 'Editor Excel', href: '/planilhas', icon: TableCellsIcon },
+  { labelKey: 'navigation.documentation', fallback: 'Documentação', href: '/docs', icon: BookOpenIcon },
+  { labelKey: 'navigation.aiAssistant', fallback: 'IA Assistant', href: '/ia', icon: SparklesIcon },
+  { labelKey: 'navigation.integrations', fallback: 'Integrações', href: '/integrations', icon: LinkIcon, roles: ['admin'] },
+  { labelKey: 'navigation.adminLogs', fallback: 'Logs de Auditoria', href: '/admin/logs', icon: DocumentMagnifyingGlassIcon, roles: ['admin'] },
+  { labelKey: 'navigation.profile', fallback: 'Perfil', href: '/perfil', icon: UserCircleIcon },
+  { labelKey: 'navigation.settings', fallback: 'Configurações', href: '/configuracoes', icon: Cog6ToothIcon },
   { name: 'Dashboard', href: '/dashboard', icon: ChartBarIcon },
   { name: 'Inventário', href: '/inventory', icon: ClipboardDocumentCheckIcon },
   { name: 'Aplicações', href: '/applications', icon: CpuChipIcon },
@@ -61,6 +90,7 @@ type SidebarProps = {
 export function Sidebar({ variant = 'desktop', onNavigate }: SidebarProps) {
   const pathname = usePathname();
   const role = useAuthStore((state) => state.user?.role);
+  const { t } = useTranslation('common');
 
   const baseClasses =
     variant === 'desktop'
@@ -87,9 +117,10 @@ export function Sidebar({ variant = 'desktop', onNavigate }: SidebarProps) {
         {items.map((item) => {
           const active = pathname === item.href;
           const Icon = item.icon;
+          const label = t(item.labelKey as any, { defaultValue: item.fallback });
           return (
             <Link
-              key={item.name}
+              key={item.href}
               href={item.href}
               className={clsx(
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
@@ -98,7 +129,7 @@ export function Sidebar({ variant = 'desktop', onNavigate }: SidebarProps) {
               onClick={onNavigate}
             >
               <Icon className="h-5 w-5" />
-              {item.name}
+              {label}
             </Link>
           );
         })}

@@ -7,6 +7,7 @@ RUN npm run build
 
 FROM node:20-alpine
 WORKDIR /app
+RUN apk add --no-cache curl
 COPY --from=deps /app/package*.json ./
 RUN npm install --omit=dev
 COPY --from=deps /app/.next ./.next

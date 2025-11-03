@@ -19,6 +19,7 @@ services:
   frontend  -> Next.js SPA
   postgres  -> PostgreSQL 15
 
+
 ```
 
 ## Configuração rápida
