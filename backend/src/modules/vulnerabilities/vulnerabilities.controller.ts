@@ -3,9 +3,13 @@ import { VulnerabilitiesService } from './vulnerabilities.service';
 import { CreateVulnerabilityDto } from './dto/create-vulnerability.dto';
 import { UpdateVulnerabilityDto } from './dto/update-vulnerability.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRole } from '@prisma/client';
 
 @Controller('vulnerabilities')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.admin, UserRole.analyst, UserRole.auditor)
 export class VulnerabilitiesController {
   constructor(private readonly vulnerabilitiesService: VulnerabilitiesService) {}
 

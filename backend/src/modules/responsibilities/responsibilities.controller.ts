@@ -14,9 +14,13 @@ import { ResponsibilitiesService } from './responsibilities.service';
 import { CreateResponsibleDto } from './dto/create-responsible.dto';
 import { UpdateResponsibleDto } from './dto/update-responsible.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { UserRole } from '@prisma/client';
 
 @Controller('responsibles')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.admin, UserRole.analyst)
 export class ResponsibilitiesController {
   constructor(private readonly responsibilitiesService: ResponsibilitiesService) {}
 

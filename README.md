@@ -11,9 +11,9 @@ Plataforma integrada para equipes de segurança da informação consolidarem dad
 
 ```
 services:
-  app       -> backend NestJS
+  backend   -> backend NestJS
   frontend  -> Next.js SPA
-  db        -> PostgreSQL 15
+  postgres  -> PostgreSQL 15
 ```
 
 ## Configuração rápida
@@ -49,7 +49,7 @@ Ou via Docker Compose:
 docker-compose up --build
 ```
 
-A aplicação padrão autentica usuários usando JWT. O seed cria o usuário `admin@appsec.local` (senha `Admin@123` – hash pré-configurado) e carrega documentação e templates base.
+A aplicação padrão autentica usuários usando JWT. O seed cria o usuário `admin@appsec.local` (senha `admin123`) e carrega documentação e templates base.
 
 ## Principais recursos
 
@@ -114,7 +114,7 @@ Makefile
 
 ## Autenticação
 
-Consuma `/api/auth/register` ou `/api/auth/login` para obter JWT. O frontend salva o token em `localStorage` (`appsec-token`). Configure o cabeçalho `Authorization: Bearer <token>` para chamadas autenticadas.
+Consuma `/api/auth/register` ou `/api/auth/login` para obter JWT. A API entrega o token via cookie HTTP-only (`appsec_token`), permitindo chamadas autenticadas sem expor o segredo no navegador. O frontend usa `withCredentials` para enviar cookies automaticamente.
 
 ## Observações
 

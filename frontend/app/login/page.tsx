@@ -23,9 +23,8 @@ export default function LoginPage() {
     setError('');
     try {
       const response = await api.post('/auth/login', values);
-      localStorage.setItem('appsec-token', response.data.access_token);
       setUser(response.data.user);
-      router.push('/');
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err?.response?.data?.message ?? 'Falha ao autenticar.');
     } finally {
