@@ -1,15 +1,29 @@
-import { Body, BadRequestException, Controller, Get, Post, UploadedFile, UseGuards, UseInterceptors, Req } from '@nestjs/common';
+import {
+  Body,
+  BadRequestException,
+  Controller,
+  Get,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+  Req,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { IntegrationsService } from './integrations.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Request } from 'express';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { UserRole } from '@prisma/client';
 
 @Controller('integrations')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class IntegrationsController {
   constructor(private readonly integrationsService: IntegrationsService) {}
 
   @Post('semgrep')
+  @Roles(UserRole.admin, UserRole.analyst)
   @UseInterceptors(FileInterceptor('file'))
   importSemgrep(@UploadedFile() file: Express.Multer.File, @Req() req: Request) {
     if (!file) {
@@ -20,6 +34,7 @@ export class IntegrationsController {
   }
 
   @Post('tool')
+  @Roles(UserRole.admin, UserRole.analyst)
   importTool(@Body() body: { tool: string; data: any; filename?: string }, @Req() req: Request) {
     if (!body?.tool) {
       throw new BadRequestException('Informe o nome da ferramenta');
@@ -29,7 +44,25 @@ export class IntegrationsController {
   }
 
   @Get('history')
+  @Roles(UserRole.admin, UserRole.analyst, UserRole.auditor)
   history() {
     return this.integrationsService.history();
+  }
+
+  @Get()
+  @Roles(UserRole.admin, UserRole.analyst)
+  status() {
+    return this.integrationsService.getIntegrationStatuses();
+  }
+
+  @Post('telegram')
+  @Roles(UserRole.admin)
+  configureTelegram(@Body() body: { botToken: string; chatId: string; enabled?: boolean }) {
+    return this.integrationsService.saveIntegrationConfig('telegram', {
+      botToken: body.botToken,
+      chatId: body.chatId,
+      enabled: body.enabled ?? true,
+      updatedAt: new Date().toISOString(),
+    });
   }
 }

@@ -9,7 +9,8 @@ async function main() {
   await prisma.$connect();
 
   const adminEmail = 'admin@appsec.local';
-  const hashedPassword = await bcrypt.hash('Admin@123', 10);
+  const adminPassword = process.env.ADMIN_PASSWORD ?? 'admin123';
+  const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },

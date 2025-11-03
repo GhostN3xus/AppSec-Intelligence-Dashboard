@@ -11,9 +11,10 @@ Plataforma integrada para equipes de segurança da informação consolidarem dad
 
 ```
 services:
-  app       -> backend NestJS
-  frontend  -> Next.js SPA
-  db        -> PostgreSQL 15
+  backend      -> backend NestJS
+  frontend     -> Next.js SPA
+  postgres     -> PostgreSQL 15
+  sast-parser  -> Ingestão automática de relatórios Semgrep/SCA
 ```
 
 ## Configuração rápida
@@ -49,14 +50,16 @@ Ou via Docker Compose:
 docker-compose up --build
 ```
 
-A aplicação padrão autentica usuários usando JWT. O seed cria o usuário `admin@appsec.local` (senha `Admin@123` – hash pré-configurado) e carrega documentação e templates base.
+A aplicação padrão autentica usuários usando JWT. O seed cria o usuário `admin@appsec.local` (senha `admin123`) e carrega documentação e templates base.
 
 ## Principais recursos
 
 ### Importação & Correlação
-- Upload Semgrep (CSV/JSON) pelo endpoint `/api/integrations/semgrep` ou via CLI: `make import-semgrep file=relatorio.csv`.
-- Endpoint genérico `/api/integrations/tool` para Nessus, Nmap, Burp ou ZAP (JSON).
-- Correlaciona achados por aplicação e responsável, registrando auditoria de importações.
+- Upload Semgrep SAST (CSV) direto na interface `/sast` ou pelo endpoint `/api/import/sast`.
+- Upload Semgrep Supply Chain/SCA via `/sast/sca` ou endpoint `/api/import/sca`.
+- Conteiner `sast-parser` monitora `./sast-reports/*.csv` e envia automaticamente ao backend usando o usuário seed `admin@appsec.local`.
+- Importações alimentam `Vulnerability` e `DependencyFinding`, gerando logs em `ImportLog`, auditoria e alertas Telegram opcionais.
+- Endpoint genérico `/api/integrations/tool` permanece disponível para outras ferramentas (JSON).
 
 ### Gestão de aplicações e responsáveis
 - CRUD completo via `/api/applications` e `/api/responsibles`.
@@ -114,7 +117,7 @@ Makefile
 
 ## Autenticação
 
-Consuma `/api/auth/register` ou `/api/auth/login` para obter JWT. O frontend salva o token em `localStorage` (`appsec-token`). Configure o cabeçalho `Authorization: Bearer <token>` para chamadas autenticadas.
+Consuma `/api/auth/register` ou `/api/auth/login` para obter JWT. A API entrega o token via cookie HTTP-only (`appsec_token`), permitindo chamadas autenticadas sem expor o segredo no navegador. O frontend usa `withCredentials` para enviar cookies automaticamente.
 
 ## Observações
 
