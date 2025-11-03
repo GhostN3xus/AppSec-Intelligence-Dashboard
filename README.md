@@ -11,9 +11,14 @@ Plataforma integrada para equipes de segurança da informação consolidarem dad
 
 ```
 services:
+  backend      -> backend NestJS
+  frontend     -> Next.js SPA
+  postgres     -> PostgreSQL 15
+  sast-parser  -> Ingestão automática de relatórios Semgrep/SCA
   backend   -> backend NestJS
   frontend  -> Next.js SPA
   postgres  -> PostgreSQL 15
+
 ```
 
 ## Configuração rápida
@@ -54,9 +59,11 @@ A aplicação padrão autentica usuários usando JWT. O seed cria o usuário `ad
 ## Principais recursos
 
 ### Importação & Correlação
-- Upload Semgrep (CSV/JSON) pelo endpoint `/api/integrations/semgrep` ou via CLI: `make import-semgrep file=relatorio.csv`.
-- Endpoint genérico `/api/integrations/tool` para Nessus, Nmap, Burp ou ZAP (JSON).
-- Correlaciona achados por aplicação e responsável, registrando auditoria de importações.
+- Upload Semgrep SAST (CSV) direto na interface `/sast` ou pelo endpoint `/api/import/sast`.
+- Upload Semgrep Supply Chain/SCA via `/sast/sca` ou endpoint `/api/import/sca`.
+- Conteiner `sast-parser` monitora `./sast-reports/*.csv` e envia automaticamente ao backend usando o usuário seed `admin@appsec.local`.
+- Importações alimentam `Vulnerability` e `DependencyFinding`, gerando logs em `ImportLog`, auditoria e alertas Telegram opcionais.
+- Endpoint genérico `/api/integrations/tool` permanece disponível para outras ferramentas (JSON).
 
 ### Gestão de aplicações e responsáveis
 - CRUD completo via `/api/applications` e `/api/responsibles`.

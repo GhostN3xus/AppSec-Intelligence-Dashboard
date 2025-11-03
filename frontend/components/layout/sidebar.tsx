@@ -20,6 +20,8 @@ import {
   BoltIcon,
   UserCircleIcon,
   Cog6ToothIcon,
+  BeakerIcon,
+  LinkIcon,
 } from '@heroicons/react/24/outline';
 import { useAuthStore } from '../../store/auth-store';
 
@@ -38,6 +40,7 @@ const navigation: NavigationItem[] = [
   { name: 'Domínios', href: '/domains', icon: GlobeAltIcon },
   { name: 'Admin Usuários', href: '/admin/users', icon: AdjustmentsHorizontalIcon, roles: ['admin'] },
   { name: 'SAST', href: '/sast', icon: ShieldCheckIcon },
+  { name: 'SCA', href: '/sast/sca', icon: BeakerIcon },
   { name: 'DAST', href: '/dast', icon: BoltIcon },
   { name: 'SLA', href: '/sla', icon: ClockIcon },
   { name: 'Relatórios', href: '/templates', icon: DocumentDuplicateIcon },
@@ -45,6 +48,7 @@ const navigation: NavigationItem[] = [
   { name: 'Editor Excel', href: '/planilhas', icon: TableCellsIcon },
   { name: 'Documentações OWASP', href: '/documentacao', icon: BookOpenIcon },
   { name: 'IA Assistant', href: '/ia', icon: SparklesIcon },
+  { name: 'Integrações', href: '/integrations', icon: LinkIcon, roles: ['admin'] },
   { name: 'Perfil', href: '/perfil', icon: UserCircleIcon },
   { name: 'Configurações', href: '/configuracoes', icon: Cog6ToothIcon },
 ];

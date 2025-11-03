@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { FindingType } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateVulnerabilityDto } from './dto/create-vulnerability.dto';
 import { UpdateVulnerabilityDto } from './dto/update-vulnerability.dto';
@@ -86,12 +87,30 @@ export class VulnerabilitiesService {
     }));
   }
 
-  async recordFinding(vulnerabilityId: string, source: string, rawData: any) {
+  async recordFinding(
+    vulnerabilityId: string,
+    data: {
+      source: string;
+      rawData: any;
+      type?: FindingType;
+      filePath?: string;
+      lineNumber?: number;
+      ruleId?: string;
+      message?: string;
+      context?: string;
+    },
+  ) {
     const finding = await this.prisma.finding.create({
       data: {
         vulnerabilityId,
-        source,
-        rawData,
+        source: data.source,
+        rawData: data.rawData,
+        type: data.type ?? FindingType.sast,
+        filePath: data.filePath,
+        lineNumber: data.lineNumber,
+        ruleId: data.ruleId,
+        message: data.message,
+        context: data.context,
       },
     });
     return finding;

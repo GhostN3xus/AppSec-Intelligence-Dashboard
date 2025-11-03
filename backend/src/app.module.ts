@@ -16,6 +16,8 @@ import { AuditModule } from './modules/audit/audit.module';
 import { AiModule } from './modules/ai/ai.module';
 import { DomainsModule } from './modules/domains/domains.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
+import { ImportsModule } from './modules/imports/imports.module';
+import { DependencyFindingsModule } from './modules/dependency-findings/dependency-findings.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { RolesGuard } from './common/guards/roles.guard';
 
@@ -37,6 +39,8 @@ import { RolesGuard } from './common/guards/roles.guard';
     ReportsModule,
     SlaModule,
     IntegrationsModule,
+    ImportsModule,
+    DependencyFindingsModule,
     KnowledgeBaseModule,
     AuditModule,
     AiModule,
