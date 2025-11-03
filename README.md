@@ -18,6 +18,7 @@ services:
 
 ## Configuração rápida
 
+
 ### Setup automatizado
 
 ```bash
@@ -28,6 +29,7 @@ O assistente solicitará a chave de API de IA (ex.: OpenAI) e cuidará de copiar
 
 ### Setup manual
 
+
 ```bash
 make install           # instala dependências backend + frontend
 cp backend/.env.example backend/.env
@@ -37,7 +39,11 @@ make dev-backend       # inicia API em http://localhost:4000
 make dev-frontend      # inicia frontend em http://localhost:3000
 ```
 
+
 ### Containers
+
+Ou via Docker Compose:
+
 
 ```bash
 docker-compose up --build
