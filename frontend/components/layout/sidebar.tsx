@@ -21,13 +21,22 @@ import {
   UserCircleIcon,
   Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
+import { useAuthStore } from '../../store/auth-store';
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: ChartBarIcon },
+type NavigationItem = {
+  name: string;
+  href: string;
+  icon: typeof ChartBarIcon;
+  roles?: string[];
+};
+
+const navigation: NavigationItem[] = [
+  { name: 'Dashboard', href: '/dashboard', icon: ChartBarIcon },
   { name: 'Inventário', href: '/inventory', icon: ClipboardDocumentCheckIcon },
   { name: 'Aplicações', href: '/applications', icon: CpuChipIcon },
   { name: 'Responsáveis', href: '/responsaveis', icon: UserGroupIcon },
   { name: 'Domínios', href: '/domains', icon: GlobeAltIcon },
+  { name: 'Admin Usuários', href: '/admin/users', icon: AdjustmentsHorizontalIcon, roles: ['admin'] },
   { name: 'SAST', href: '/sast', icon: ShieldCheckIcon },
   { name: 'DAST', href: '/dast', icon: BoltIcon },
   { name: 'SLA', href: '/sla', icon: ClockIcon },
@@ -47,11 +56,18 @@ type SidebarProps = {
 
 export function Sidebar({ variant = 'desktop', onNavigate }: SidebarProps) {
   const pathname = usePathname();
+  const role = useAuthStore((state) => state.user?.role);
 
   const baseClasses =
     variant === 'desktop'
       ? 'hidden md:flex md:w-64 md:flex-col border-r border-slate-800 bg-slate-950/80 backdrop-blur'
       : 'flex flex-col border border-slate-800 bg-slate-950/95 backdrop-blur rounded-xl p-2';
+
+  const items = navigation.filter((item) => {
+    if (!item.roles) return true;
+    if (!role) return false;
+    return item.roles.includes(role);
+  });
 
   return (
     <aside className={baseClasses}>
@@ -64,7 +80,7 @@ export function Sidebar({ variant = 'desktop', onNavigate }: SidebarProps) {
         <span className="font-display text-xl text-primary-light">AppSec Intelligence</span>
       </div>
       <nav className="flex flex-1 flex-col gap-2 p-4">
-        {navigation.map((item) => {
+        {items.map((item) => {
           const active = pathname === item.href;
           const Icon = item.icon;
           return (

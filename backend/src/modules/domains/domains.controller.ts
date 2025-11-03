@@ -4,9 +4,13 @@ import { DomainsService } from './domains.service';
 import { CreateDomainDto } from './dto/create-domain.dto';
 import { UpdateDomainDto } from './dto/update-domain.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRole } from '@prisma/client';
 
 @Controller('domains')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.admin, UserRole.analyst, UserRole.owner)
 export class DomainsController {
   constructor(private readonly domainsService: DomainsService) {}
 
