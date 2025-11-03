@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-cyber text-gray-100 font-body;
+}
+
+main {
+  @apply min-h-screen;
+}
+
+.cyber-card {
+  @apply bg-slate-900/70 border border-slate-700 rounded-xl p-6 backdrop-blur;
+}
+
+.cyber-grid {
+  @apply grid gap-6;
+}
