@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
+import { ExportCustomDto } from './dto/export-custom.dto';
 import { GenerateReportDto, ReportFormatType } from './dto/generate-report.dto';
 import PDFDocument from 'pdfkit';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
@@ -50,6 +51,15 @@ export class ReportsService {
     });
     return {
       id: report.id,
+      fileName: `${input.name}.${input.format}`,
+      mimeType: this.getMimeType(input.format),
+      data: buffer,
+    };
+  }
+
+  async exportCustom(input: ExportCustomDto) {
+    const buffer = await this.renderBuffer(input.content, input.format);
+    return {
       fileName: `${input.name}.${input.format}`,
       mimeType: this.getMimeType(input.format),
       data: buffer,

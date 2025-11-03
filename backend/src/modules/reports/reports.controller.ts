@@ -5,6 +5,7 @@ import { CreateTemplateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
 import { GenerateReportDto } from './dto/generate-report.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ExportCustomDto } from './dto/export-custom.dto';
 
 @Controller('reports')
 @UseGuards(JwtAuthGuard)
@@ -34,6 +35,14 @@ export class ReportsController {
   @Post('generate')
   async generate(@Body() body: GenerateReportDto, @Res() res: Response) {
     const result = await this.reportsService.generateReport(body);
+    res.setHeader('Content-Type', result.mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${result.fileName}"`);
+    res.send(result.data);
+  }
+
+  @Post('export')
+  async exportCustom(@Body() body: ExportCustomDto, @Res() res: Response) {
+    const result = await this.reportsService.exportCustom(body);
     res.setHeader('Content-Type', result.mimeType);
     res.setHeader('Content-Disposition', `attachment; filename="${result.fileName}"`);
     res.send(result.data);
