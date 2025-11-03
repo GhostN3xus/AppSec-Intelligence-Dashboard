@@ -62,6 +62,7 @@ model Application {
   responsible Responsible? @relation(fields: [responsibleId], references: [id])
   domains      Domain[]
   vulnerabilities Vulnerability[]
+  dependencyFindings DependencyFinding[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -90,14 +91,42 @@ model Vulnerability {
   updatedAt     DateTime @updatedAt
 }
 
+enum FindingType {
+  sast
+  sca
+  manual
+}
+
 model Finding {
-  id              String   @id @default(uuid())
+  id              String       @id @default(uuid())
   source          String
   rawData         Json
-  falsePositive   Boolean  @default(false)
+  falsePositive   Boolean      @default(false)
+  type            FindingType  @default(sast)
+  filePath        String?
+  lineNumber      Int?
+  ruleId          String?
+  message         String?
+  context         String?
   vulnerabilityId String?
   vulnerability   Vulnerability? @relation(fields: [vulnerabilityId], references: [id])
-  createdAt       DateTime @default(now())
+  createdAt       DateTime     @default(now())
+}
+
+model DependencyFinding {
+  id              String       @id @default(uuid())
+  package         String
+  version         String?
+  ecosystem       String?
+  severity        String?
+  advisoryId      String?
+  dependencyFile  String?
+  tool            String?
+  applicationId   String?
+  application     Application? @relation(fields: [applicationId], references: [id])
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  rawData         Json?
 }
 
 model ReportTemplate {
