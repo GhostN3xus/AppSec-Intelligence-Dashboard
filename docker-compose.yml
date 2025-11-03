@@ -1,29 +1,58 @@
 version: '3.9'
 services:
-  app:
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: appsec
+      POSTGRES_PASSWORD: appsec
+      POSTGRES_DB: appsec_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U appsec -d appsec_db']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
     build: ./backend
     ports:
       - '4000:4000'
     env_file:
       - ./backend/.env.example
+    environment:
+      DATABASE_URL: postgresql://appsec:appsec@postgres:5432/appsec_db
+      JWT_SECRET: supersecret
+      JWT_EXPIRATION: 1d
+      PORT: 4000
+      CORS_ORIGIN: http://localhost:3000
+      ADMIN_PASSWORD: admin123
     depends_on:
-      - db
+      postgres:
+        condition: service_healthy
+
   frontend:
     build: ./frontend
     ports:
       - '3000:3000'
     environment:
-      NEXT_PUBLIC_API_URL: http://app:4000
+      NEXT_PUBLIC_API_URL: http://backend:4000
     depends_on:
-      - app
-  db:
-    image: postgres:15
-    restart: unless-stopped
+      - backend
+
+  sast-parser:
+    build: ./sast-parser
     environment:
-      POSTGRES_USER: appsec
-      POSTGRES_PASSWORD: securepass
-      POSTGRES_DB: appsec_dashboard
+      API_BASE_URL: http://backend:4000/api
+      IMPORT_EMAIL: admin@appsec.local
+      IMPORT_PASSWORD: admin123
+      POLL_INTERVAL: 30
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./sast-reports:/data
+    depends_on:
+      - backend
 volumes:
   pgdata:

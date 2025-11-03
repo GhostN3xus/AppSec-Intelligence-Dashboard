@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import api from '../../lib/api-client';
+import { useAuthStore } from '../../store/auth-store';
 
 const roles = [
   { value: 'analyst', label: 'Analista AppSec' },
@@ -28,14 +29,15 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const setUser = useAuthStore((state) => state.setUser);
 
   const onSubmit = handleSubmit(async (values) => {
     setError('');
     setLoading(true);
     try {
-      await api.post('/auth/register', values);
-      alert('Usuário registrado com sucesso. Faça login para continuar.');
-      router.push('/login');
+      const response = await api.post('/auth/register', values);
+      setUser(response.data.user);
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err?.response?.data?.message ?? 'Não foi possível registrar.');
     } finally {

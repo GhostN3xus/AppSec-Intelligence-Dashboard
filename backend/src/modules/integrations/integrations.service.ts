@@ -1,8 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { parse as parseCsv } from 'csv-parse/sync';
 import { VulnerabilitiesService } from '../vulnerabilities/vulnerabilities.service';
 import { AuditService } from '../audit/audit.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { FindingType } from '@prisma/client';
+import axios from 'axios';
 
 interface GenericFinding {
   title: string;
@@ -16,6 +18,8 @@ interface GenericFinding {
 
 @Injectable()
 export class IntegrationsService {
+  private readonly logger = new Logger(IntegrationsService.name);
+
   constructor(
     private readonly vulnerabilitiesService: VulnerabilitiesService,
     private readonly auditService: AuditService,
@@ -87,7 +91,12 @@ export class IntegrationsService {
         cvss: finding.cvss,
         tool,
       } as any);
-      await this.vulnerabilitiesService.recordFinding(vulnerability.id, tool, finding);
+      await this.vulnerabilitiesService.recordFinding(vulnerability.id, {
+        source: tool,
+        rawData: finding,
+        type: FindingType.manual,
+        message: finding.description,
+      });
       created.push(vulnerability);
     }
     await this.auditService.log('import', tool, actorId, { count: created.length });
@@ -99,6 +108,7 @@ export class IntegrationsService {
         actorId,
       },
     });
+    await this.sendAlert(`${tool} importou ${created.length} findings.`);
     return { tool, created: created.length };
   }
 
@@ -116,6 +126,36 @@ export class IntegrationsService {
       return this.prisma.integrationConfig.update({ where: { id: existing.id }, data: { settings } });
     }
     return this.prisma.integrationConfig.create({ data: { provider, settings } });
+  }
+
+  async getIntegrationStatuses() {
+    const configs = await this.prisma.integrationConfig.findMany();
+    return configs.map((config) => ({
+      provider: config.provider,
+      enabled: Boolean((config.settings as any)?.enabled),
+      details: config.settings,
+      updatedAt: config.updatedAt,
+    }));
+  }
+
+  async sendAlert(message: string) {
+    try {
+      const telegramConfig = await this.prisma.integrationConfig.findFirst({ where: { provider: 'telegram' } });
+      if (!telegramConfig) {
+        return;
+      }
+      const settings = (telegramConfig.settings ?? {}) as { botToken?: string; chatId?: string; enabled?: boolean };
+      if (!settings.enabled || !settings.botToken || !settings.chatId) {
+        return;
+      }
+      await axios.post(`https://api.telegram.org/bot${settings.botToken}/sendMessage`, {
+        chat_id: settings.chatId,
+        text: message,
+        parse_mode: 'HTML',
+      });
+    } catch (error) {
+      this.logger.warn(`Falha ao enviar alerta para o Telegram: ${error.message}`);
+    }
   }
 
   private normalizeSeverity(severity: string): 'critical' | 'high' | 'medium' | 'low' {

@@ -5,4 +5,5 @@ export default () => ({
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   AZURE_OPENAI_ENDPOINT: process.env.AZURE_OPENAI_ENDPOINT,
   AZURE_OPENAI_KEY: process.env.AZURE_OPENAI_KEY,
+  CORS_ORIGIN: process.env.CORS_ORIGIN,
 });
