@@ -42,7 +42,9 @@ export function Topbar() {
         )}
         {user ? (
           <button
-            onClick={logout}
+            onClick={() => {
+              void logout();
+            }}
             className="rounded-lg border border-slate-700 px-3 py-1 text-xs font-medium uppercase tracking-wide text-gray-300 hover:border-primary hover:text-primary"
           >
             Sair

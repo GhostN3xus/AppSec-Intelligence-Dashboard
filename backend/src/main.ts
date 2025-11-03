@@ -2,9 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
@@ -15,6 +16,12 @@ async function bootstrap() {
   );
 
   const configService = app.get(ConfigService);
+  app.use(cookieParser());
+  const corsOrigin = configService.get<string>('CORS_ORIGIN');
+  app.enableCors({
+    origin: corsOrigin ? corsOrigin.split(',') : true,
+    credentials: true,
+  });
   const port = configService.get<number>('PORT') ?? 4000;
   await app.listen(port);
   console.log(`AppSec Intelligence API running on port ${port}`);
