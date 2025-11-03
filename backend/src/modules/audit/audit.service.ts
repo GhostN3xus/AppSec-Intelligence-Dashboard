@@ -22,4 +22,12 @@ export class AuditService {
       include: { actor: true },
     });
   }
+
+  loginAttempts(limit = 200) {
+    return this.prisma.loginLog.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      include: { user: true },
+    });
+  }
 }

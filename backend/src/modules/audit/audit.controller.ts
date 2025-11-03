@@ -11,4 +11,9 @@ export class AuditController {
   findAll() {
     return this.auditService.findAll();
   }
+
+  @Get('logins')
+  loginAttempts() {
+    return this.auditService.loginAttempts();
+  }
 }

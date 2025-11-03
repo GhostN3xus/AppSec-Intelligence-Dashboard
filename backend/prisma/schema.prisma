@@ -7,16 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  admin
+  analyst
+  owner
+  auditor
+}
+
+enum UserStatus {
+  active
+  suspended
+}
+
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      String   @default("analyst")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String      @id @default(uuid())
+  email      String      @unique
+  password   String
+  name       String
+  role       UserRole    @default(analyst)
+  status     UserStatus  @default(active)
+  language   String?     @default("pt-BR")
+  title      String?
+  lastLogin  DateTime?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   applications   Application[]
   auditLogs      AuditLog[]
+  loginLogs      LoginLog[]
+  resetTokens    PasswordResetToken[]
 }
 
 model Responsible {
@@ -42,6 +60,7 @@ model Application {
   owner       User?    @relation(fields: [ownerId], references: [id])
   responsibleId String?
   responsible Responsible? @relation(fields: [responsibleId], references: [id])
+  domains      Domain[]
   vulnerabilities Vulnerability[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -111,6 +130,66 @@ model KnowledgeDocument {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum DomainType {
+  domain
+  subdomain
+  ip
+  api
+}
+
+enum DomainStatus {
+  active
+  monitoring
+  deprecated
+}
+
+model Domain {
+  id            String        @id @default(uuid())
+  name          String
+  type          DomainType    @default(domain)
+  value         String
+  status        DomainStatus  @default(active)
+  environment   String?
+  notes         String?
+  applicationId String?
+  application   Application?  @relation(fields: [applicationId], references: [id])
+  responsibleId String?
+  responsible   Responsible?  @relation(fields: [responsibleId], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model LoginLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  email     String
+  success   Boolean
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id         String   @id @default(uuid())
+  tokenHash  String
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime @default(now())
+}
+
+model ImportLog {
+  id         String   @id @default(uuid())
+  tool       String
+  filename   String?
+  findings   Int
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id])
+  createdAt  DateTime @default(now())
 }
 
 model AuditLog {

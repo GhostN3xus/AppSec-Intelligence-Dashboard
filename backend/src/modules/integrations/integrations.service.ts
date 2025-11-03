@@ -22,7 +22,7 @@ export class IntegrationsService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async importSemgrep(buffer: Buffer, actorId?: string) {
+  async importSemgrep(buffer: Buffer, actorId?: string, filename?: string) {
     const text = buffer.toString('utf-8');
     let findings: GenericFinding[] = [];
     if (text.trim().startsWith('{')) {
@@ -51,10 +51,10 @@ export class IntegrationsService {
         owasp: record.owasp,
       }));
     }
-    return this.ingestFindings('Semgrep', findings, actorId);
+    return this.ingestFindings('Semgrep', findings, actorId, filename);
   }
 
-  async importTool(tool: string, data: any, actorId?: string) {
+  async importTool(tool: string, data: any, actorId?: string, filename?: string) {
     if (!tool) {
       throw new BadRequestException('Provider da ferramenta é obrigatório');
     }
@@ -72,10 +72,10 @@ export class IntegrationsService {
     } else if (payload && Array.isArray((payload as any).findings)) {
       findings = (payload as any).findings.map((item: any) => this.mapGenericFinding(item));
     }
-    return this.ingestFindings(tool, findings, actorId);
+    return this.ingestFindings(tool, findings, actorId, filename);
   }
 
-  private async ingestFindings(tool: string, findings: GenericFinding[], actorId?: string) {
+  private async ingestFindings(tool: string, findings: GenericFinding[], actorId?: string, filename?: string) {
     const created = [];
     for (const finding of findings) {
       const vulnerability = await this.vulnerabilitiesService.create({
@@ -91,7 +91,23 @@ export class IntegrationsService {
       created.push(vulnerability);
     }
     await this.auditService.log('import', tool, actorId, { count: created.length });
+    await this.prisma.importLog.create({
+      data: {
+        tool,
+        findings: created.length,
+        filename,
+        actorId,
+      },
+    });
     return { tool, created: created.length };
+  }
+
+  history(limit = 50) {
+    return this.prisma.importLog.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      include: { actor: true },
+    });
   }
 
   async saveIntegrationConfig(provider: string, settings: Record<string, any>) {
