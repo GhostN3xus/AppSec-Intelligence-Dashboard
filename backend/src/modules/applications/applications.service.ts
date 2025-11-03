@@ -16,6 +16,7 @@ export class ApplicationsService {
       include: {
         responsible: true,
         vulnerabilities: true,
+        domains: true,
       },
     });
   }
@@ -26,6 +27,7 @@ export class ApplicationsService {
       include: {
         responsible: true,
         vulnerabilities: true,
+        domains: true,
       },
     });
   }

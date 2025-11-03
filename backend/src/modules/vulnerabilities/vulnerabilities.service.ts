@@ -20,12 +20,20 @@ export class VulnerabilitiesService {
     });
   }
 
-  findAll(params: { status?: string; applicationId?: string; severity?: string } = {}) {
+  findAll(
+    params: { status?: string; applicationId?: string; severity?: string; type?: string; from?: string; to?: string } = {},
+  ) {
+    const { status, applicationId, severity, type, from, to } = params;
     return this.prisma.vulnerability.findMany({
       where: {
-        status: params.status,
-        applicationId: params.applicationId,
-        severity: params.severity,
+        status,
+        applicationId,
+        severity,
+        type,
+        detectedAt: {
+          gte: from ? new Date(from) : undefined,
+          lte: to ? new Date(to) : undefined,
+        },
       },
       include: {
         application: true,

@@ -1,6 +1,6 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
-enum ReportFormat {
+export enum ReportFormat {
   pdf = 'pdf',
   docx = 'docx',
   html = 'html',

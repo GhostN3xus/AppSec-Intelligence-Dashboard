@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { PrismaService } from '../prisma/prisma.service';
 import { SLA_DEADLINES } from '../common/utils/sla';
 import * as bcrypt from 'bcrypt';
+import { DomainStatus, DomainType, UserRole } from '@prisma/client';
 
 async function main() {
   const prisma = new PrismaService();
@@ -17,7 +18,9 @@ async function main() {
       email: adminEmail,
       password: hashedPassword,
       name: 'AppSec Admin',
-      role: 'admin',
+      role: UserRole.admin,
+      title: 'Administrador AppSec',
+      language: 'pt-BR',
     },
   });
 
@@ -81,6 +84,19 @@ async function main() {
       create: template,
     });
   }
+
+  await prisma.domain.upsert({
+    where: { id: 'seed-domain-1' },
+    update: {},
+    create: {
+      id: 'seed-domain-1',
+      name: 'Portal Público',
+      type: DomainType.domain,
+      value: 'appsec.local',
+      status: DomainStatus.active,
+      notes: 'Portal institucional monitorado.',
+    },
+  });
 
   console.log('Seed completed. Admin user:', admin.email);
   await prisma.$disconnect();

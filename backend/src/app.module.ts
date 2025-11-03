@@ -13,6 +13,8 @@ import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { KnowledgeBaseModule } from './modules/knowledge-base/knowledge-base.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { AiModule } from './modules/ai/ai.module';
+import { DomainsModule } from './modules/domains/domains.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { AiModule } from './modules/ai/ai.module';
     KnowledgeBaseModule,
     AuditModule,
     AiModule,
+    DomainsModule,
+    InventoryModule,
   ],
 })
 export class AppModule {}

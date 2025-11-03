@@ -3,16 +3,41 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { clsx } from 'clsx';
-import { ChartBarIcon, ShieldCheckIcon, AdjustmentsHorizontalIcon, DocumentDuplicateIcon, UserGroupIcon, CpuChipIcon } from '@heroicons/react/24/outline';
+import {
+  ChartBarIcon,
+  ShieldCheckIcon,
+  AdjustmentsHorizontalIcon,
+  DocumentDuplicateIcon,
+  UserGroupIcon,
+  CpuChipIcon,
+  GlobeAltIcon,
+  SparklesIcon,
+  DocumentTextIcon,
+  TableCellsIcon,
+  BookOpenIcon,
+  ClockIcon,
+  ClipboardDocumentCheckIcon,
+  BoltIcon,
+  UserCircleIcon,
+  Cog6ToothIcon,
+} from '@heroicons/react/24/outline';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: ChartBarIcon },
+  { name: 'Inventário', href: '/inventory', icon: ClipboardDocumentCheckIcon },
   { name: 'Aplicações', href: '/applications', icon: CpuChipIcon },
-  { name: 'Vulnerabilidades', href: '/vulnerabilities', icon: ShieldCheckIcon },
   { name: 'Responsáveis', href: '/responsaveis', icon: UserGroupIcon },
-  { name: 'Documentação', href: '/documentacao', icon: DocumentDuplicateIcon },
-  { name: 'Templates', href: '/templates', icon: DocumentDuplicateIcon },
-  { name: 'Configurações', href: '/configuracoes', icon: AdjustmentsHorizontalIcon },
+  { name: 'Domínios', href: '/domains', icon: GlobeAltIcon },
+  { name: 'SAST', href: '/sast', icon: ShieldCheckIcon },
+  { name: 'DAST', href: '/dast', icon: BoltIcon },
+  { name: 'SLA', href: '/sla', icon: ClockIcon },
+  { name: 'Relatórios', href: '/templates', icon: DocumentDuplicateIcon },
+  { name: 'Editor Word', href: '/editor', icon: DocumentTextIcon },
+  { name: 'Editor Excel', href: '/planilhas', icon: TableCellsIcon },
+  { name: 'Documentações OWASP', href: '/documentacao', icon: BookOpenIcon },
+  { name: 'IA Assistant', href: '/ia', icon: SparklesIcon },
+  { name: 'Perfil', href: '/perfil', icon: UserCircleIcon },
+  { name: 'Configurações', href: '/configuracoes', icon: Cog6ToothIcon },
 ];
 
 type SidebarProps = {

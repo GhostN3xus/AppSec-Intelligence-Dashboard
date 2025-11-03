@@ -14,8 +14,11 @@ export class VulnerabilitiesController {
     @Query('status') status?: string,
     @Query('applicationId') applicationId?: string,
     @Query('severity') severity?: string,
+    @Query('type') type?: string,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
   ) {
-    return this.vulnerabilitiesService.findAll({ status, applicationId, severity });
+    return this.vulnerabilitiesService.findAll({ status, applicationId, severity, type, from, to });
   }
 
   @Get('sla/summary')
