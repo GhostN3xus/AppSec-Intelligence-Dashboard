@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("analyst")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  applications   Application[]
+  auditLogs      AuditLog[]
+}
+
+model Responsible {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  title     String?
+  department String?
+  applications Application[]
+  vulnerabilities Vulnerability[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Application {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  stack       String?
+  repository  String?
+  status      String   @default("active")
+  ownerId     String?
+  owner       User?    @relation(fields: [ownerId], references: [id])
+  responsibleId String?
+  responsible Responsible? @relation(fields: [responsibleId], references: [id])
+  vulnerabilities Vulnerability[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Vulnerability {
+  id            String   @id @default(uuid())
+  title         String
+  severity      String
+  description   String?
+  status        String   @default("open")
+  detectedAt    DateTime @default(now())
+  dueDate       DateTime
+  tool          String?
+  type          String?
+  cwe           String?
+  owasp         String?
+  owaspApi      String?
+  cvss          Float?
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id])
+  responsibleId String?
+  responsible   Responsible? @relation(fields: [responsibleId], references: [id])
+  findings      Finding[]
+  reports       Report[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Finding {
+  id              String   @id @default(uuid())
+  source          String
+  rawData         Json
+  falsePositive   Boolean  @default(false)
+  vulnerabilityId String?
+  vulnerability   Vulnerability? @relation(fields: [vulnerabilityId], references: [id])
+  createdAt       DateTime @default(now())
+}
+
+model ReportTemplate {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  category  String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reports   Report[]
+}
+
+model Report {
+  id              String   @id @default(uuid())
+  name            String
+  format          String
+  payload         Json
+  vulnerabilityId String?
+  vulnerability   Vulnerability? @relation(fields: [vulnerabilityId], references: [id])
+  templateId      String?
+  template        ReportTemplate? @relation(fields: [templateId], references: [id])
+  createdAt       DateTime @default(now())
+}
+
+model KnowledgeDocument {
+  id        String   @id @default(uuid())
+  title     String
+  slug      String   @unique
+  category  String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id])
+  action    String
+  entity    String
+  meta      Json?
+  createdAt DateTime @default(now())
+}
+
+model IntegrationConfig {
+  id        String   @id @default(uuid())
+  provider  String   @unique
+  settings  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
