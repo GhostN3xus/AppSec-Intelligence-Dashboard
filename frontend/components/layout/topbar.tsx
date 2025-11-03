@@ -5,12 +5,15 @@ import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Sidebar } from './sidebar';
 import { useAuthStore } from '../../store/auth-store';
+import { LanguageSwitcher } from './language-switcher';
+import { useTranslation } from 'react-i18next';
 
 export function Topbar() {
   const { theme, setTheme } = useTheme();
   const isDark = theme === 'dark' || theme === undefined;
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, hydrate, logout } = useAuthStore();
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     hydrate();
@@ -23,9 +26,12 @@ export function Topbar() {
         <button className="md:hidden" onClick={() => setMenuOpen((open) => !open)}>
           <Bars3Icon className="h-6 w-6 text-gray-300" />
         </button>
-        <div className="font-display text-lg text-primary-light">Befly Cyber Defense</div>
+        <div className="font-display text-lg text-primary-light">{t('brand')}</div>
       </div>
       <div className="flex items-center gap-3">
+        <div className="hidden sm:block">
+          <LanguageSwitcher />
+        </div>
         <button
           onClick={() => setTheme(isDark ? 'light' : 'dark')}
           className="rounded-full border border-slate-700 p-2 text-gray-300 hover:bg-slate-900"
@@ -38,7 +44,7 @@ export function Topbar() {
             <span>{user.email}</span>
           </div>
         ) : (
-          <div className="text-sm text-gray-400">Convidado</div>
+          <div className="text-sm text-gray-400">{t('topbar.guest')}</div>
         )}
         {user ? (
           <button
@@ -47,7 +53,7 @@ export function Topbar() {
             }}
             className="rounded-lg border border-slate-700 px-3 py-1 text-xs font-medium uppercase tracking-wide text-gray-300 hover:border-primary hover:text-primary"
           >
-            Sair
+            {t('actions.logout')}
           </button>
         ) : null}
       </div>

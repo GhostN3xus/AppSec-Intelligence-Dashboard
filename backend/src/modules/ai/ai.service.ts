@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
-import { AzureKeyCredential, OpenAIClient } from '@azure/openai';
 
 interface FindingInput {
   id: string;
@@ -14,20 +13,10 @@ interface FindingInput {
 @Injectable()
 export class AiService {
   private openai?: OpenAI;
-  private azureClient?: OpenAIClient;
-  private azureDeployment?: string;
-
   constructor(private readonly config: ConfigService) {
     const key = this.config.get<string>('OPENAI_API_KEY');
     if (key) {
       this.openai = new OpenAI({ apiKey: key });
-    }
-    const azureKey = this.config.get<string>('AZURE_OPENAI_KEY');
-    const azureEndpoint = this.config.get<string>('AZURE_OPENAI_ENDPOINT');
-    const azureDeployment = this.config.get<string>('AZURE_OPENAI_DEPLOYMENT') ?? 'gpt-4o-mini';
-    if (azureKey && azureEndpoint) {
-      this.azureClient = new OpenAIClient(azureEndpoint, new AzureKeyCredential(azureKey));
-      this.azureDeployment = azureDeployment;
     }
   }
 
@@ -35,7 +24,7 @@ export class AiService {
     if (!findings.length) {
       return [];
     }
-    if (!this.openai && !this.azureClient) {
+    if (!this.openai) {
       return findings.map((finding) => ({
         id: finding.id,
         classification: finding.severity === 'low' ? 'likely_false_positive' : 'needs_review',
@@ -79,16 +68,6 @@ Recomendação: ${details.remediation ?? 'N/A'}`;
   }
 
   private async invokeModel(prompt: string) {
-    if (this.azureClient && this.azureDeployment) {
-      const completion = await this.azureClient.getChatCompletions(this.azureDeployment, [
-        { role: 'system', content: 'Você é um assistente AppSec.' },
-        { role: 'user', content: prompt },
-      ]);
-      const choice = completion.choices?.[0]?.message?.content;
-      if (choice) {
-        return choice;
-      }
-    }
     if (this.openai) {
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-4o-mini',
