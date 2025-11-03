@@ -15,6 +15,11 @@ services:
   frontend     -> Next.js SPA
   postgres     -> PostgreSQL 15
   sast-parser  -> Ingestão automática de relatórios Semgrep/SCA
+  backend   -> backend NestJS
+  frontend  -> Next.js SPA
+  postgres  -> PostgreSQL 15
+
+
 ```
 
 ## Configuração rápida

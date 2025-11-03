@@ -31,6 +31,11 @@ import { useTranslation } from 'react-i18next';
 type NavigationItem = {
   labelKey: string;
   fallback: string;
+} from '@heroicons/react/24/outline';
+import { useAuthStore } from '../../store/auth-store';
+
+type NavigationItem = {
+  name: string;
   href: string;
   icon: typeof ChartBarIcon;
   roles?: string[];
@@ -57,6 +62,24 @@ const navigation: NavigationItem[] = [
   { labelKey: 'navigation.adminLogs', fallback: 'Logs de Auditoria', href: '/admin/logs', icon: DocumentMagnifyingGlassIcon, roles: ['admin'] },
   { labelKey: 'navigation.profile', fallback: 'Perfil', href: '/perfil', icon: UserCircleIcon },
   { labelKey: 'navigation.settings', fallback: 'Configurações', href: '/configuracoes', icon: Cog6ToothIcon },
+  { name: 'Dashboard', href: '/dashboard', icon: ChartBarIcon },
+  { name: 'Inventário', href: '/inventory', icon: ClipboardDocumentCheckIcon },
+  { name: 'Aplicações', href: '/applications', icon: CpuChipIcon },
+  { name: 'Responsáveis', href: '/responsaveis', icon: UserGroupIcon },
+  { name: 'Domínios', href: '/domains', icon: GlobeAltIcon },
+  { name: 'Admin Usuários', href: '/admin/users', icon: AdjustmentsHorizontalIcon, roles: ['admin'] },
+  { name: 'SAST', href: '/sast', icon: ShieldCheckIcon },
+  { name: 'SCA', href: '/sast/sca', icon: BeakerIcon },
+  { name: 'DAST', href: '/dast', icon: BoltIcon },
+  { name: 'SLA', href: '/sla', icon: ClockIcon },
+  { name: 'Relatórios', href: '/templates', icon: DocumentDuplicateIcon },
+  { name: 'Editor Word', href: '/editor', icon: DocumentTextIcon },
+  { name: 'Editor Excel', href: '/planilhas', icon: TableCellsIcon },
+  { name: 'Documentações OWASP', href: '/documentacao', icon: BookOpenIcon },
+  { name: 'IA Assistant', href: '/ia', icon: SparklesIcon },
+  { name: 'Integrações', href: '/integrations', icon: LinkIcon, roles: ['admin'] },
+  { name: 'Perfil', href: '/perfil', icon: UserCircleIcon },
+  { name: 'Configurações', href: '/configuracoes', icon: Cog6ToothIcon },
 ];
 
 type SidebarProps = {
