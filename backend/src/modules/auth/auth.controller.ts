@@ -38,7 +38,7 @@ export class AuthController {
   }
 
   @Post('login')
-  @Throttle(5, 60)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   async login(@Body() body: LoginDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.login(body.email, body.password, req.ip, req.headers['user-agent']);
     this.attachAuthCookie(res, result.access_token);
@@ -53,7 +53,7 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  @Throttle(3, 300)
+  @Throttle({ default: { limit: 3, ttl: 300000 } })
   forgotPassword(@Body() body: ForgotPasswordDto, @Req() req: Request) {
     return this.authService.forgotPassword(body, req.ip, req.headers['user-agent']);
   }

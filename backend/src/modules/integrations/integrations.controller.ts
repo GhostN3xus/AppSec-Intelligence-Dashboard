@@ -33,6 +33,18 @@ export class IntegrationsController {
     return this.integrationsService.importSemgrep(file.buffer, user?.sub, file.originalname);
   }
 
+  @Post('dast')
+  @Roles(UserRole.admin, UserRole.analyst)
+  @UseInterceptors(FileInterceptor('file'))
+  importDast(@UploadedFile() file: Express.Multer.File, @Body() body: { tool?: string }, @Req() req: Request) {
+    if (!file) {
+      throw new BadRequestException('Arquivo não enviado');
+    }
+    const user = req.user as any;
+    const tool = body.tool || 'DAST';
+    return this.integrationsService.importDast(file.buffer, tool, user?.sub, file.originalname);
+  }
+
   @Post('tool')
   @Roles(UserRole.admin, UserRole.analyst)
   importTool(@Body() body: { tool: string; data: any; filename?: string }, @Req() req: Request) {
@@ -61,6 +73,16 @@ export class IntegrationsController {
     return this.integrationsService.saveIntegrationConfig('telegram', {
       botToken: body.botToken,
       chatId: body.chatId,
+      enabled: body.enabled ?? true,
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
+  @Post('email')
+  @Roles(UserRole.admin)
+  configureEmail(@Body() body: { recipients: string[]; enabled?: boolean }) {
+    return this.integrationsService.saveIntegrationConfig('email', {
+      recipients: body.recipients,
       enabled: body.enabled ?? true,
       updatedAt: new Date().toISOString(),
     });
