@@ -57,12 +57,5 @@ import { HealthModule } from './modules/health/health.module';
     },
     RolesGuard,
   ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
-    RolesGuard,
-  ],
 })
 export class AppModule {}

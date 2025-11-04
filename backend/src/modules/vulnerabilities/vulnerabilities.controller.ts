@@ -54,4 +54,28 @@ export class VulnerabilitiesController {
   remove(@Param('id') id: string) {
     return this.vulnerabilitiesService.remove(id);
   }
+
+  @Post('bulk/update')
+  @Roles(UserRole.admin, UserRole.analyst)
+  bulkUpdate(@Body() body: { ids: string[]; data: Partial<UpdateVulnerabilityDto> }) {
+    return this.vulnerabilitiesService.bulkUpdate(body.ids, body.data);
+  }
+
+  @Post('bulk/delete')
+  @Roles(UserRole.admin)
+  bulkDelete(@Body() body: { ids: string[] }) {
+    return this.vulnerabilitiesService.bulkDelete(body.ids);
+  }
+
+  @Post('bulk/assign')
+  @Roles(UserRole.admin, UserRole.analyst)
+  bulkAssign(@Body() body: { ids: string[]; responsibleId: string }) {
+    return this.vulnerabilitiesService.bulkAssign(body.ids, body.responsibleId);
+  }
+
+  @Post('bulk/status')
+  @Roles(UserRole.admin, UserRole.analyst)
+  bulkChangeStatus(@Body() body: { ids: string[]; status: string }) {
+    return this.vulnerabilitiesService.bulkChangeStatus(body.ids, body.status);
+  }
 }

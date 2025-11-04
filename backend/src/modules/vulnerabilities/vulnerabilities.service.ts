@@ -115,4 +115,53 @@ export class VulnerabilitiesService {
     });
     return finding;
   }
+
+  async bulkUpdate(ids: string[], data: Partial<UpdateVulnerabilityDto>) {
+    const updated = await this.prisma.vulnerability.updateMany({
+      where: { id: { in: ids } },
+      data,
+    });
+    return {
+      count: updated.count,
+      message: `${updated.count} vulnerabilidades atualizadas com sucesso`,
+    };
+  }
+
+  async bulkDelete(ids: string[]) {
+    // Delete related findings first
+    await this.prisma.finding.deleteMany({
+      where: { vulnerabilityId: { in: ids } },
+    });
+
+    // Delete vulnerabilities
+    const deleted = await this.prisma.vulnerability.deleteMany({
+      where: { id: { in: ids } },
+    });
+    return {
+      count: deleted.count,
+      message: `${deleted.count} vulnerabilidades removidas com sucesso`,
+    };
+  }
+
+  async bulkAssign(ids: string[], responsibleId: string) {
+    const updated = await this.prisma.vulnerability.updateMany({
+      where: { id: { in: ids } },
+      data: { responsibleId },
+    });
+    return {
+      count: updated.count,
+      message: `${updated.count} vulnerabilidades atribuídas com sucesso`,
+    };
+  }
+
+  async bulkChangeStatus(ids: string[], status: string) {
+    const updated = await this.prisma.vulnerability.updateMany({
+      where: { id: { in: ids } },
+      data: { status },
+    });
+    return {
+      count: updated.count,
+      message: `Status de ${updated.count} vulnerabilidades alterado com sucesso`,
+    };
+  }
 }

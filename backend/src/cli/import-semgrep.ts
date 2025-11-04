@@ -2,10 +2,12 @@
 import 'reflect-metadata';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { VulnerabilitiesService } from '../modules/vulnerabilities/vulnerabilities.service';
 import { AuditService } from '../modules/audit/audit.service';
 import { IntegrationsService } from '../modules/integrations/integrations.service';
+import { EmailService } from '../modules/integrations/email.service';
 
 async function bootstrap() {
   const args = process.argv.slice(2);
@@ -19,9 +21,11 @@ async function bootstrap() {
   const buffer = readFileSync(absolutePath);
   const prisma = new PrismaService();
   await prisma.$connect();
+  const configService = new ConfigService();
   const vulnerabilitiesService = new VulnerabilitiesService(prisma);
   const auditService = new AuditService(prisma);
-  const integrationsService = new IntegrationsService(vulnerabilitiesService, auditService, prisma);
+  const emailService = new EmailService(configService);
+  const integrationsService = new IntegrationsService(vulnerabilitiesService, auditService, prisma, emailService);
   const result = await integrationsService.importSemgrep(buffer);
   console.log(`Imported ${result.created} findings from ${result.tool}`);
   await prisma.$disconnect();

@@ -29,6 +29,15 @@ export class ResponsibilitiesController {
     return this.responsibilitiesService.findAll();
   }
 
+  @Get('/export/excel')
+  async exportExcel(@Res() res: Response) {
+    const workbook = await this.responsibilitiesService.exportToWorkbook();
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename="responsaveis.xlsx"');
+    await workbook.xlsx.write(res);
+    res.end();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.responsibilitiesService.findOne(id);
@@ -47,14 +56,5 @@ export class ResponsibilitiesController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.responsibilitiesService.remove(id);
-  }
-
-  @Get('/export/excel')
-  async exportExcel(@Res() res: Response) {
-    const workbook = await this.responsibilitiesService.exportToWorkbook();
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename="responsaveis.xlsx"');
-    await workbook.xlsx.write(res);
-    res.end();
   }
 }

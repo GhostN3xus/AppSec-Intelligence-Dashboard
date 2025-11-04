@@ -1,6 +1,9 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { HealthService } from './health.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRole } from '@prisma/client';
 
 @Controller('health')
 export class HealthController {
@@ -12,7 +15,8 @@ export class HealthController {
   }
 
   @Get('modules')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.admin, UserRole.analyst)
   async modules() {
     return this.healthService.moduleStatuses();
   }
