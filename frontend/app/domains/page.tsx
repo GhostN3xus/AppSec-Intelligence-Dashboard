@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import api from '../../lib/api-client';
+import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 const domainTypes = [
   { value: 'domain', label: 'Domínio' },
@@ -21,6 +22,7 @@ export default function DomainsPage() {
     notes: '',
   });
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const load = () => {
     setLoading(true);
@@ -35,8 +37,31 @@ export default function DomainsPage() {
   }, []);
 
   const handleCreate = async () => {
-    await api.post('/domains', form);
+    if (editingId) {
+      await api.patch(`/domains/${editingId}`, form);
+      setEditingId(null);
+    } else {
+      await api.post('/domains', form);
+    }
     setForm({ name: '', type: 'domain', value: '', environment: '', status: 'active', notes: '' });
+    load();
+  };
+
+  const handleEdit = (domain: any) => {
+    setEditingId(domain.id);
+    setForm({
+      name: domain.name,
+      type: domain.type,
+      value: domain.value,
+      environment: domain.environment || '',
+      status: domain.status,
+      notes: domain.notes || '',
+    });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este domínio?')) return;
+    await api.delete(`/domains/${id}`);
     load();
   };
 
@@ -64,6 +89,9 @@ export default function DomainsPage() {
         </button>
       </div>
       <div className="cyber-card space-y-4">
+        <h2 className="text-lg font-display text-primary-light">
+          {editingId ? 'Editar Ativo' : 'Adicionar Novo Ativo'}
+        </h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <input
             value={form.name}
@@ -110,12 +138,25 @@ export default function DomainsPage() {
             className="rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2 text-sm text-white focus:border-primary focus:outline-none"
           />
         </div>
-        <button
-          onClick={handleCreate}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white hover:brightness-110"
-        >
-          Adicionar ativo
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={handleCreate}
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white hover:brightness-110"
+          >
+            {editingId ? 'Atualizar ativo' : 'Adicionar ativo'}
+          </button>
+          {editingId && (
+            <button
+              onClick={() => {
+                setEditingId(null);
+                setForm({ name: '', type: 'domain', value: '', environment: '', status: 'active', notes: '' });
+              }}
+              className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium uppercase tracking-wide text-gray-300 hover:border-primary"
+            >
+              Cancelar
+            </button>
+          )}
+        </div>
       </div>
       <div className="cyber-card">
         {loading ? (
@@ -131,6 +172,7 @@ export default function DomainsPage() {
                   <th className="py-2">Status</th>
                   <th className="py-2">Aplicação</th>
                   <th className="py-2">Responsável</th>
+                  <th className="py-2 text-right">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
@@ -139,9 +181,35 @@ export default function DomainsPage() {
                     <td className="py-3 font-medium text-white">{domain.name}</td>
                     <td className="py-3 text-gray-300">{domain.type}</td>
                     <td className="py-3 text-gray-300">{domain.value}</td>
-                    <td className="py-3 text-gray-300">{domain.status}</td>
+                    <td className="py-3">
+                      <span className={`rounded-full px-3 py-1 text-xs uppercase ${
+                        domain.status === 'active' ? 'bg-green-500/20 text-green-300' :
+                        domain.status === 'monitoring' ? 'bg-blue-500/20 text-blue-300' :
+                        'bg-gray-500/20 text-gray-300'
+                      }`}>
+                        {domain.status}
+                      </span>
+                    </td>
                     <td className="py-3 text-gray-400">{domain.application?.name ?? '-'}</td>
                     <td className="py-3 text-gray-400">{domain.responsible?.name ?? '-'}</td>
+                    <td className="py-3">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleEdit(domain)}
+                          className="rounded border border-slate-700 p-2 text-gray-300 hover:border-primary hover:text-primary"
+                          title="Editar"
+                        >
+                          <PencilIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(domain.id)}
+                          className="rounded border border-red-500/40 p-2 text-red-300 hover:border-red-500"
+                          title="Excluir"
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
