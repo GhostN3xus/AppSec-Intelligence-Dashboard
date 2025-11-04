@@ -20,10 +20,10 @@ export default function ConfiguracoesPage() {
   const [importHistory, setImportHistory] = useState<any[]>([]);
 
   useEffect(() => {
-    api.get('/sla/config').then((response) => setSla(response.data));
+    api.get('/sla/config').then((response) => setSla(response.data)).catch((err) => console.error('Erro ao carregar SLA:', err));
     loadUsers();
-    api.get('/audit/logins').then((response) => setLoginLogs(response.data ?? []));
-    api.get('/integrations/history').then((response) => setImportHistory(response.data ?? []));
+    api.get('/audit/logins').then((response) => setLoginLogs(response.data ?? [])).catch((err) => console.error('Erro ao carregar logs:', err));
+    api.get('/integrations/history').then((response) => setImportHistory(response.data ?? [])).catch((err) => console.error('Erro ao carregar histórico:', err));
   }, []);
 
   const loadUsers = () => {

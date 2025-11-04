@@ -8,10 +8,11 @@ export default function SlaPage() {
   const [vulns, setVulns] = useState<any[]>([]);
 
   useEffect(() => {
-    api.get('/vulnerabilities/sla/summary').then((response) => setSummary(response.data));
+    api.get('/vulnerabilities/sla/summary').then((response) => setSummary(response.data)).catch((err) => console.error('Erro ao carregar resumo SLA:', err));
     api
       .get('/vulnerabilities', { params: { status: 'open' } })
-      .then((response) => setVulns(response.data ?? []));
+      .then((response) => setVulns(response.data ?? []))
+      .catch((err) => console.error('Erro ao carregar vulnerabilidades:', err));
   }, []);
 
   return (
@@ -43,12 +44,17 @@ export default function SlaPage() {
           <h2 className="text-xl font-display text-primary-light">Vulnerabilidades em aberto</h2>
           <button
             onClick={async () => {
-              const response = await api.get('/responsibilities/export/excel', { responseType: 'blob' });
-              const url = window.URL.createObjectURL(response.data);
-              const link = document.createElement('a');
-              link.href = url;
-              link.download = 'sla-export.xlsx';
-              link.click();
+              try {
+                const response = await api.get('/vulnerabilities/export/excel', { responseType: 'blob' });
+                const url = window.URL.createObjectURL(response.data);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'sla-export.xlsx';
+                link.click();
+              } catch (error) {
+                console.error('Erro ao exportar:', error);
+                alert('Erro ao exportar planilha. Tente novamente.');
+              }
             }}
             className="rounded-lg border border-primary/60 px-4 py-2 text-xs font-medium uppercase tracking-wide text-primary hover:bg-primary/10"
           >
