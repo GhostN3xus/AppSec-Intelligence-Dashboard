@@ -26,9 +26,29 @@ export default function DocumentacaoPage() {
 
   const handleSave = async () => {
     if (!selected) return;
-    await api.put(`/knowledge-base/${selected.slug}`, { ...selected, content });
-    setStatus('Documento atualizado com sucesso.');
-    load();
+    try {
+      await api.put(`/knowledge-base/${selected.slug}`, { ...selected, content });
+      setStatus('Documento atualizado com sucesso.');
+      load();
+    } catch (error) {
+      console.error('Erro ao salvar:', error);
+      setStatus('Erro ao salvar documento.');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selected) return;
+    if (!confirm(`Tem certeza que deseja excluir "${selected.title}"?`)) return;
+    try {
+      await api.delete(`/knowledge-base/${selected.slug}`);
+      setSelected(null);
+      setContent('');
+      setStatus('');
+      load();
+    } catch (error) {
+      console.error('Erro ao excluir:', error);
+      alert('Erro ao excluir documento.');
+    }
   };
 
   return (
@@ -57,9 +77,14 @@ export default function DocumentacaoPage() {
           <>
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-display text-primary-light">{selected.title}</h2>
-              <button className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white" onClick={handleSave}>
-                Salvar alterações
-              </button>
+              <div className="flex gap-2">
+                <button className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white" onClick={handleSave}>
+                  Salvar alterações
+                </button>
+                <button className="rounded-lg border border-red-500 px-4 py-2 text-sm font-semibold text-red-400 hover:bg-red-500/10" onClick={handleDelete}>
+                  Excluir
+                </button>
+              </div>
             </div>
             {status ? <div className="text-sm text-emerald-400">{status}</div> : null}
             <MarkdownEditor value={content} onChange={setContent} />

@@ -9,6 +9,7 @@ export default function VulnerabilitiesPage() {
   const [selected, setSelected] = useState<any | null>(null);
   const [summary, setSummary] = useState<string>('');
   const [triage, setTriage] = useState<any[]>([]);
+  const [editingVuln, setEditingVuln] = useState<any | null>(null);
 
   const loadVulns = () => {
     setLoading(true);
@@ -38,6 +39,34 @@ export default function VulnerabilitiesPage() {
       findings: vulns.map((v) => ({ id: v.id, title: v.title, severity: v.severity, description: v.description })),
     });
     setTriage(response.data);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta vulnerabilidade?')) return;
+    try {
+      await api.delete(`/vulnerabilities/${id}`);
+      loadVulns();
+    } catch (error) {
+      console.error('Erro ao excluir:', error);
+      alert('Erro ao excluir vulnerabilidade.');
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!editingVuln) return;
+    try {
+      await api.patch(`/vulnerabilities/${editingVuln.id}`, {
+        title: editingVuln.title,
+        description: editingVuln.description,
+        severity: editingVuln.severity,
+        status: editingVuln.status,
+      });
+      setEditingVuln(null);
+      loadVulns();
+    } catch (error) {
+      console.error('Erro ao atualizar:', error);
+      alert('Erro ao atualizar vulnerabilidade.');
+    }
   };
 
   return (
@@ -72,9 +101,15 @@ export default function VulnerabilitiesPage() {
                     <td className="py-3 text-gray-400">{vuln.application?.name ?? 'N/A'}</td>
                     <td className="py-3 text-gray-400">{vuln.responsible?.name ?? 'N/A'}</td>
                     <td className="py-3 text-gray-400">{new Date(vuln.dueDate).toLocaleDateString()}</td>
-                    <td className="py-3">
+                    <td className="py-3 space-x-2">
                       <button className="text-primary-light hover:underline" onClick={() => handleSummarize(vuln)}>
                         Resumo IA
+                      </button>
+                      <button className="text-blue-400 hover:underline" onClick={() => setEditingVuln(vuln)}>
+                        Editar
+                      </button>
+                      <button className="text-red-400 hover:underline" onClick={() => handleDelete(vuln.id)}>
+                        Excluir
                       </button>
                     </td>
                   </tr>
@@ -102,6 +137,67 @@ export default function VulnerabilitiesPage() {
               </li>
             ))}
           </ul>
+        </div>
+      ) : null}
+      {editingVuln ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="cyber-card w-full max-w-2xl space-y-4">
+            <h2 className="text-xl font-display text-primary-light">Editar Vulnerabilidade</h2>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm text-gray-400">Título</label>
+                <input
+                  type="text"
+                  value={editingVuln.title}
+                  onChange={(e) => setEditingVuln({ ...editingVuln, title: e.target.value })}
+                  className="w-full rounded border border-slate-700 bg-slate-900 p-2 text-white"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400">Descrição</label>
+                <textarea
+                  value={editingVuln.description || ''}
+                  onChange={(e) => setEditingVuln({ ...editingVuln, description: e.target.value })}
+                  className="w-full rounded border border-slate-700 bg-slate-900 p-2 text-white"
+                  rows={4}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400">Severidade</label>
+                <select
+                  value={editingVuln.severity}
+                  onChange={(e) => setEditingVuln({ ...editingVuln, severity: e.target.value })}
+                  className="w-full rounded border border-slate-700 bg-slate-900 p-2 text-white"
+                >
+                  <option value="critical">Critical</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm text-gray-400">Status</label>
+                <select
+                  value={editingVuln.status}
+                  onChange={(e) => setEditingVuln({ ...editingVuln, status: e.target.value })}
+                  className="w-full rounded border border-slate-700 bg-slate-900 p-2 text-white"
+                >
+                  <option value="open">Open</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="false_positive">False Positive</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={handleUpdate} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white">
+                Salvar
+              </button>
+              <button onClick={() => setEditingVuln(null)} className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-gray-400">
+                Cancelar
+              </button>
+            </div>
+          </div>
         </div>
       ) : null}
     </div>

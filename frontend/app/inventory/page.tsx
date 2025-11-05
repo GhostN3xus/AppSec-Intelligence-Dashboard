@@ -7,7 +7,10 @@ export default function InventoryPage() {
   const [data, setData] = useState<any | null>(null);
 
   useEffect(() => {
-    api.get('/inventory/summary').then((response) => setData(response.data));
+    api.get('/inventory/summary').then((response) => setData(response.data)).catch((err) => {
+      console.error('Erro ao carregar inventário:', err);
+      alert('Erro ao carregar inventário. Tente novamente.');
+    });
   }, []);
 
   if (!data) {
