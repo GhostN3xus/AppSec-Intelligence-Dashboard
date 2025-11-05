@@ -14,6 +14,7 @@ import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { KnowledgeBaseModule } from './modules/knowledge-base/knowledge-base.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { AiModule } from './modules/ai/ai.module';
+import { AiProvidersModule } from './modules/ai-providers/ai-providers.module';
 import { DomainsModule } from './modules/domains/domains.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { ImportsModule } from './modules/imports/imports.module';
@@ -46,6 +47,7 @@ import { HealthModule } from './modules/health/health.module';
     KnowledgeBaseModule,
     AuditModule,
     AiModule,
+    AiProvidersModule,
     DomainsModule,
     InventoryModule,
     HealthModule,

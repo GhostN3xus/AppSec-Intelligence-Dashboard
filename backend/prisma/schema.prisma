@@ -35,6 +35,7 @@ model User {
   auditLogs      AuditLog[]
   loginLogs      LoginLog[]
   resetTokens    PasswordResetToken[]
+  importLogs     ImportLog[]
 }
 
 model Responsible {
@@ -45,6 +46,7 @@ model Responsible {
   department String?
   applications Application[]
   vulnerabilities Vulnerability[]
+  domains   Domain[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
