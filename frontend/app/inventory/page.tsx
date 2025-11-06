@@ -1,57 +1,46 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 import api from '../../lib/api-client';
+import { ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline';
 
-export default function InventoryPage() {
-  const [data, setData] = useState<any | null>(null);
+const fetcher = (url: string) => api.get(url).then((res) => res.data);
 
-  useEffect(() => {
-    api.get('/inventory/summary').then((response) => setData(response.data)).catch((err) => {
-      console.error('Erro ao carregar inventário:', err);
-      alert('Erro ao carregar inventário. Tente novamente.');
-    });
-  }, []);
+function StatCard({ title, value }) {
+  return (
+    <div className="bg-slate-900 p-6 rounded-lg text-center">
+      <h3 className="text-lg font-semibold text-gray-400">{title}</h3>
+      <p className="text-4xl font-bold text-white">{value}</p>
+    </div>
+  );
+}
 
-  if (!data) {
-    return <div className="cyber-card text-gray-400">Carregando inventário...</div>;
-  }
+function InventoryClient() {
+  const { data, error } = useSWR('/inventory/summary', fetcher);
+
+  if (error) return <div>Falha ao carregar o inventário.</div>;
+  if (!data) return <div>Carregando...</div>;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-display text-primary-light">Inventário AppSec</h1>
-        <p className="text-sm text-gray-400">Resumo das aplicações, responsáveis, domínios e vulnerabilidades monitoradas.</p>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <StatCard title="Aplicações" value={data.applications} />
+      <StatCard title="Responsáveis" value={data.responsibles} />
+      <StatCard title="Domínios" value={data.domains} />
+      <StatCard title="Vulnerabilidades Abertas" value={data.totals.open} />
+    </div>
+  );
+}
+
+export default function InventoryPage() {
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center gap-3">
+        <ClipboardDocumentCheckIcon className="h-8 w-8 text-primary-light" />
+        <h1 className="text-4xl font-display font-bold text-white">
+          Inventário de Ativos
+        </h1>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="cyber-card">
-          <h2 className="text-xs uppercase tracking-wide text-gray-400">Aplicações</h2>
-          <p className="mt-2 text-3xl font-bold text-primary-light">{data.applications}</p>
-        </div>
-        <div className="cyber-card">
-          <h2 className="text-xs uppercase tracking-wide text-gray-400">Responsáveis</h2>
-          <p className="mt-2 text-3xl font-bold text-primary-light">{data.responsibles}</p>
-        </div>
-        <div className="cyber-card">
-          <h2 className="text-xs uppercase tracking-wide text-gray-400">Domínios</h2>
-          <p className="mt-2 text-3xl font-bold text-primary-light">{data.domains}</p>
-        </div>
-        <div className="cyber-card">
-          <h2 className="text-xs uppercase tracking-wide text-gray-400">Vulnerabilidades (abertas)</h2>
-          <p className="mt-2 text-3xl font-bold text-primary-light">{data.totals.open}</p>
-        </div>
-      </div>
-      <div className="cyber-card">
-        <h2 className="text-xl font-display text-primary-light">Severidade por volume</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {Object.entries(data.vulnerabilities).map(([severity, total]) => (
-            <div key={severity} className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-              <div className="text-xs uppercase text-gray-400">{severity}</div>
-              <div className="text-2xl font-bold text-white">{total as number}</div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <InventoryClient />
     </div>
   );
 }
