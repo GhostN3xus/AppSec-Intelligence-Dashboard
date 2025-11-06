@@ -26,7 +26,9 @@ export function Topbar() {
         <button className="md:hidden" onClick={() => setMenuOpen((open) => !open)}>
           <Bars3Icon className="h-6 w-6 text-gray-300" />
         </button>
-        <div className="font-display text-lg text-primary-light">{t('brand')}</div>
+        <a href="/dashboard" className="font-display text-lg text-primary-light">
+          AppSec Intelligence
+        </a>
       </div>
       <div className="flex items-center gap-3">
         <div className="hidden sm:block">

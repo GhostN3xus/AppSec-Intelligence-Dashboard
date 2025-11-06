@@ -37,7 +37,6 @@ type NavigationItem = {
 };
 
 const navigation: NavigationItem[] = [
-  { labelKey: 'navigation.home', fallback: 'Home', href: '/home', icon: HomeIcon },
   { labelKey: 'navigation.dashboard', fallback: 'Dashboard', href: '/dashboard', icon: ChartBarIcon },
   { labelKey: 'navigation.inventory', fallback: 'Inventário', href: '/inventory', icon: ClipboardDocumentCheckIcon },
   { labelKey: 'navigation.applications', fallback: 'Aplicações', href: '/applications', icon: CpuChipIcon },
