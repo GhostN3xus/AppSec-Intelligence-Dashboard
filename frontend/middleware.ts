@@ -13,7 +13,8 @@ export function middleware(request: NextRequest) {
   }
 
   // Check for authentication token in cookies
-  const token = request.cookies.get('token')?.value;
+  // IMPORTANT: Cookie name must match backend (appsec_token)
+  const token = request.cookies.get('appsec_token')?.value;
 
   // If no token and not on public route, redirect to login
   if (!token) {
