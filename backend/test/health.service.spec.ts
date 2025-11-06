@@ -5,13 +5,25 @@ describe('HealthService', () => {
 
   const prismaMock = {
     $transaction: jest.fn().mockResolvedValue([
-      4,
-      2,
-      3,
-      { createdAt: now },
-      { createdAt: now },
-      { updatedAt: now },
+      4, // sastCount
+      2, // scaCount
+      3, // reportCount
+      { createdAt: now }, // lastSast
+      { createdAt: now }, // lastSca
+      { updatedAt: now }, // lastReport
     ]),
+    finding: {
+      count: jest.fn(),
+      findFirst: jest.fn(),
+    },
+    dependencyFinding: {
+      count: jest.fn(),
+      findFirst: jest.fn(),
+    },
+    reportTemplate: {
+      count: jest.fn(),
+      findFirst: jest.fn(),
+    },
   } as any;
 
   it('returns module statuses with health metadata', async () => {
